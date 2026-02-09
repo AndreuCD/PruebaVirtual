@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Panorámica dentro de esfera</title>
+<meta name="description" content="Escena 360° esférica">
+<script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+</head>
+<body>
+<a-scene background="color: #FFFFFF">
+
+  <!-- Esfera en vez de cilindro -->
+  <a-sphere 
+    src="clase.jpg"
+    radius="10"
+    material="side: back">
+  </a-sphere>
+
+  <!-- Cámara -->
+  <a-entity position="0 0 0">
+    <a-camera wasd-controls-enabled="true" look-controls="true"></a-camera>
+  </a-entity>
+
+  <!-- Luz -->
+  <a-entity light="type: ambient; intensity: 1.0; color: #ffffff"></a-entity>
+
+</a-scene>
+</body>
+</html>
