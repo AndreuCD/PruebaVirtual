@@ -1,29 +1,85 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8">
-<title>Panorámica dentro de esfera</title>
-<meta name="description" content="Escena 360° esférica">
-<script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-</head>
-<body>
-<a-scene background="color: #FFFFFF">
+  <head>
+    <meta charset="utf-8">
+    <title>A-Frame - Interacción 360</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  </head>
+  <body>
 
-  <!-- Esfera en vez de cilindro -->
-  <a-sphere 
-    src="clase.jpg"
-    radius="10"
-    material="side: back">
-  </a-sphere>
+    <a-scene>
+      <a-assets>
+        <a-asset-item id="resModelo1" src="modelo.glb"></a-asset-item>
+        <a-asset-item id="resModelo2" src="modelo2.glb"></a-asset-item>
+        <a-asset-item id="resModelo3" src="modelo3.glb"></a-asset-item>
+        <img id="img1" src="imagen1.jpg">
+        <img id="img2" src="imagen2.jpg">
+        <img id="img3" src="imagen3.jpg">
+      </a-assets>
 
-  <!-- Cámara -->
-  <a-entity position="0 0 0">
-    <a-camera wasd-controls-enabled="true" look-controls="true"></a-camera>
-  </a-entity>
+      <a-entity id="rig" position="0 51 0">
+        <a-entity camera look-controls>
+            <a-cursor fuse="true" fuse-timeout="2000" color="yellow" raycaster="objects: .interactuable" scale="0.5 0.5 0.5"></a-cursor>
+        </a-entity>
+      </a-entity>
 
-  <!-- Luz -->
-  <a-entity light="type: ambient; intensity: 1.0; color: #ffffff"></a-entity>
+      <a-entity id="mod1" class="mod" position="0 50.5 -4" visible="false" scale="0.6 0.6 0.6">
+          <a-entity gltf-model="#resModelo1"></a-entity>
+      </a-entity>
+      
+      <a-entity id="mod2" class="mod" position="0 50.5 -4" visible="false" scale="2 2 2">
+          <a-entity gltf-model="#resModelo2"></a-entity>
+      </a-entity>
 
-</a-scene>
-</body>
+      <a-entity id="mod3" class="mod" position="0 50.5 -4" visible="false" scale="2 2 2">
+          <a-entity gltf-model="#resModelo3" position="0 0 0.5"></a-entity>
+      </a-entity>
+
+      <a-image class="interactuable" src="#img1" position="-3 51 5" rotation="0 180 0" width="2" height="1.5"></a-image>
+      <a-image class="interactuable" src="#img2" position="0 51 5" rotation="0 180 0" width="2" height="1.5"></a-image>
+      <a-image class="interactuable" src="#img3" position="3 51 5" rotation="0 180 0" width="2" height="1.5"></a-image>
+
+      <a-sky color="#050505"></a-sky>
+      <a-entity light="type: ambient; intensity: 1.5"></a-entity>
+      <a-entity light="type: directional; intensity: 1" position="1 5 1"></a-entity>
+    </a-scene>
+
+    <script>
+      document.querySelectorAll('.interactuable').forEach(imagen => {
+        let timerLook = null;
+        let timerOcultar = null;
+
+        imagen.addEventListener('mouseenter', function () {
+          const targetID = this.getAttribute('data-target') || `#mod${this.getAttribute('src').match(/\d+/)[0]}`;
+          const modelo = document.querySelector(targetID);
+
+          timerLook = setTimeout(() => {
+            document.querySelectorAll('.mod').forEach(m => {
+              m.setAttribute('visible', false);
+              m.removeAttribute('animation');
+            });
+
+            if (modelo) {
+              modelo.setAttribute('visible', true);
+              // Giro más lento: dur: 8000 (8 segundos por vuelta)
+              modelo.setAttribute('animation', {
+                property: 'rotation',
+                to: '0 360 0', 
+                loop: true,
+                dur: 8000,
+                easing: 'linear'
+              });
+
+              if (timerOcultar) clearTimeout(timerOcultar);
+              timerOcultar = setTimeout(() => {
+                modelo.setAttribute('visible', false);
+              }, 30000);
+            }
+          }, 2000);
+        });
+
+        imagen.addEventListener('mouseleave', () => clearTimeout(timerLook));
+      });
+    </script>
+  </body>
 </html>
